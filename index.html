@@ -16,7 +16,7 @@
   /* ---- Theme tokens ---- */
   body.dark  { --page:#26211d; --card:#26211d; --band:transparent; --kicker:#e0a89f;
                --big:#f26555; --note:#d9d3c8; --rule:rgba(255,255,255,0.14); --icon:#f26555; }
-  body.light { --page:#ded9d1; --card:#ffffff; --band:#c0392b; --kicker:rgba(255,255,255,0.85);
+  body.light { --page:#ffffff; --card:#ffffff; --band:#c0392b; --kicker:rgba(255,255,255,0.85);
                --big:#ffffff; --note:#1c1a17; --rule:rgba(0,0,0,0.10); --icon:#c0392b; }
 
   body { background:var(--page); }
@@ -27,7 +27,7 @@
   /* Top band — big characters */
   .band { background:var(--band); padding:44px 36px 40px; text-align:center; display:flex; flex-direction:column; align-items:center; justify-content:center; flex:1; }
   .kicker { font-family:'Inter',sans-serif; font-size:13px; font-weight:600; letter-spacing:0.24em; text-transform:uppercase; color:var(--kicker); margin-bottom:24px; }
-  .big { font-family:'Noto Sans SC',sans-serif; font-size:108px; line-height:0.98; font-weight:900; color:var(--big); letter-spacing:0.06em; }
+  .big { font-family:'Noto Sans SC',sans-serif; font-size:clamp(72px, 24vw, 92px); line-height:1.02; font-weight:900; color:var(--big); letter-spacing:0.06em; }
   body.dark  .big { animation:pulseDark  2.8s ease-in-out infinite; }
   body.light .big { animation:pulseLight 2.8s ease-in-out infinite; }
 
@@ -36,6 +36,8 @@
   .rule { height:1px; background:var(--rule); margin:32px 0; }
   body.light .body .rule:first-child { display:none; }
   body.light .body { padding-top:40px; }
+  body.light .wrap { padding:0; }
+  body.light .card { max-width:none; min-height:100vh; border-radius:0; box-shadow:none; }
   .note { margin:0; font-size:21px; font-weight:500; line-height:1.65; color:var(--note); }
   .iconrow { display:flex; justify-content:center; }
   .icon { position:relative; width:132px; height:132px; border-radius:50%; border:9px solid var(--icon); display:flex; align-items:center; justify-content:center; }
