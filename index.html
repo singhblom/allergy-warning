@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>花生过敏警告卡</title>
+<meta name="theme-color" content="#26211d">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="apple-touch-icon" href="./icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  html, body { margin:0; height:100%; -webkit-text-size-adjust:100%; }
+
+  /* ---- Theme tokens ---- */
+  body.dark  { --page:#26211d; --card:#26211d; --band:transparent; --kicker:#e0a89f;
+               --big:#f26555; --note:#d9d3c8; --rule:rgba(255,255,255,0.14); --icon:#f26555; }
+  body.light { --page:#ded9d1; --card:#ffffff; --band:#c0392b; --kicker:rgba(255,255,255,0.85);
+               --big:#ffffff; --note:#1c1a17; --rule:rgba(0,0,0,0.10); --icon:#c0392b; }
+
+  body { background:var(--page); }
+
+  .wrap { min-height:100vh; box-sizing:border-box; display:flex; align-items:center; justify-content:center; padding:24px; font-family:'Inter',sans-serif; }
+  .card { position:relative; width:100%; max-width:420px; min-height:88vh; background:var(--card); border-radius:32px; box-sizing:border-box; overflow:hidden; display:flex; flex-direction:column; box-shadow:0 24px 60px rgba(40,20,15,0.22); }
+
+  /* Top band — big characters */
+  .band { background:var(--band); padding:44px 36px 40px; text-align:center; display:flex; flex-direction:column; align-items:center; justify-content:center; flex:1; }
+  .kicker { font-family:'Inter',sans-serif; font-size:13px; font-weight:600; letter-spacing:0.24em; text-transform:uppercase; color:var(--kicker); margin-bottom:24px; }
+  .big { font-family:'Noto Sans SC',sans-serif; font-size:108px; line-height:0.98; font-weight:900; color:var(--big); letter-spacing:0.06em; }
+  body.dark  .big { animation:pulseDark  2.8s ease-in-out infinite; }
+  body.light .big { animation:pulseLight 2.8s ease-in-out infinite; }
+
+  /* Bottom section — instruction + icon */
+  .body { padding:0 36px 44px; text-align:center; font-family:'Noto Sans SC',sans-serif; }
+  .rule { height:1px; background:var(--rule); margin:32px 0; }
+  body.light .body .rule:first-child { display:none; }
+  body.light .body { padding-top:40px; }
+  .note { margin:0; font-size:21px; font-weight:500; line-height:1.65; color:var(--note); }
+  .iconrow { display:flex; justify-content:center; }
+  .icon { position:relative; width:132px; height:132px; border-radius:50%; border:9px solid var(--icon); display:flex; align-items:center; justify-content:center; }
+  .slash { position:absolute; left:50%; top:50%; width:150px; height:9px; background:var(--icon); transform:translate(-50%,-50%) rotate(45deg); border-radius:9px; }
+
+  @keyframes pulseDark  { 0%,100%{ text-shadow:0 0 0 rgba(242,101,85,0);   transform:scale(1); }
+                          50%   { text-shadow:0 0 18px rgba(255,138,92,0.32); transform:scale(1.02); } }
+  @keyframes pulseLight { 0%,100%{ text-shadow:0 0 0 rgba(255,255,255,0);  transform:scale(1); }
+                          50%   { text-shadow:0 0 16px rgba(255,255,255,0.45); transform:scale(1.02); } }
+
+  /* Discreet theme switch */
+  .swap { position:fixed; left:16px; bottom:16px; width:34px; height:34px; border-radius:50%;
+          border:1px solid rgba(128,128,128,0.35); background:rgba(128,128,128,0.12);
+          color:rgba(128,128,128,0.9); display:flex; align-items:center; justify-content:center;
+          cursor:pointer; opacity:0.4; transition:opacity .2s; padding:0; }
+  .swap:hover, .swap:active { opacity:0.9; }
+  .swap svg { width:17px; height:17px; }
+</style>
+</head>
+<body class="dark">
+  <div class="wrap">
+    <div class="card">
+      <div class="band">
+        <div class="kicker">Peanut Allergy</div>
+        <div class="big">花生<br>过敏</div>
+      </div>
+      <div class="body">
+        <div class="rule"></div>
+        <p class="note">我儿子对花生严重过敏，<br>误食可能危及生命。<br>请确保食物不含花生。</p>
+        <div class="rule"></div>
+        <div class="iconrow">
+          <div class="icon">
+            <span style="font-size:64px; line-height:1;">🥜</span>
+            <div class="slash"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <button class="swap" id="swap" aria-label="切换样式 / Switch style">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="9"></circle>
+      <path d="M12 3 a9 9 0 0 1 0 18 z" fill="currentColor" stroke="none"></path>
+    </svg>
+  </button>
+
+  <script>
+    var KEY = 'peanutCardTheme';
+    var saved = localStorage.getItem(KEY);
+    if (saved === 'light' || saved === 'dark') document.body.className = saved;
+    document.getElementById('swap').addEventListener('click', function () {
+      var next = document.body.classList.contains('dark') ? 'light' : 'dark';
+      document.body.className = next;
+      localStorage.setItem(KEY, next);
+      var tc = next === 'light' ? '#c0392b' : '#26211d';
+      document.querySelector('meta[name=theme-color]').setAttribute('content', tc);
+    });
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function () { navigator.serviceWorker.register('./sw.js'); });
+    }
+  </script>
+</body>
+</html>
