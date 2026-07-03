@@ -1,5 +1,5 @@
 // Bump this version string to force an update when you change files.
-const CACHE = 'peanut-card-v2';
+const CACHE = 'peanut-card-v4';
 
 // App shell — cached on install so the card works fully offline.
 const SHELL = [
