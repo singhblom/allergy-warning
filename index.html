@@ -53,6 +53,14 @@
           cursor:pointer; opacity:0.4; transition:opacity .2s; padding:0; }
   .swap:hover, .swap:active { opacity:0.9; }
   .swap svg { width:17px; height:17px; }
+
+  /* Discreet language switch */
+  .lang { position:fixed; right:16px; bottom:16px; width:34px; height:34px; border-radius:50%;
+          border:1px solid rgba(128,128,128,0.35); background:rgba(128,128,128,0.12);
+          color:rgba(128,128,128,0.9); display:flex; align-items:center; justify-content:center;
+          cursor:pointer; opacity:0.4; transition:opacity .2s; padding:0;
+          font-family:'Inter',sans-serif; font-size:13px; font-weight:600; }
+  .lang:hover, .lang:active { opacity:0.9; }
 </style>
 </head>
 <body class="dark">
@@ -60,11 +68,11 @@
     <div class="card">
       <div class="band">
         <div class="kicker">Peanut Allergy</div>
-        <div class="big">花生<br>过敏</div>
+        <div class="big" id="big">花生<br>过敏</div>
       </div>
       <div class="body">
         <div class="rule"></div>
-        <p class="note">我儿子对花生严重过敏，<br>误食可能危及生命。<br>请确保食物不含花生。</p>
+        <p class="note" id="note">我儿子对花生严重过敏，<br>误食可能危及生命。<br>请确保食物不含花生。</p>
         <div class="rule"></div>
         <div class="iconrow">
           <div class="icon">
@@ -83,6 +91,8 @@
     </svg>
   </button>
 
+  <button class="lang" id="lang" aria-label="切换语言 / Switch language">中</button>
+
   <script>
     var KEY = 'peanutCardTheme';
     var saved = localStorage.getItem(KEY);
@@ -94,6 +104,38 @@
       var tc = next === 'light' ? '#c0392b' : '#26211d';
       document.querySelector('meta[name=theme-color]').setAttribute('content', tc);
     });
+    var LANG_KEY = 'peanutCardLang';
+    var LANGS = ['hanzi', 'pinyin', 'english'];
+    var CONTENT = {
+      hanzi:   { label: '中',
+                 big:  '花生<br>过敏',
+                 note: '我儿子对花生严重过敏，<br>误食可能危及生命。<br>请确保食物不含花生。' },
+      pinyin:  { label: '拼',
+                 big:  'Huāshēng<br>Guòmǐn',
+                 note: 'Wǒ érzi duì huāshēng yánzhòng guòmǐn，<br>wùshí kěnéng wēijí shēngmìng。<br>Qǐng quèbǎo shíwù bù hán huāshēng。' },
+      english: { label: 'EN',
+                 big:  'Peanut<br>Allergy',
+                 note: 'My son is severely allergic to peanuts.<br>Accidental ingestion may be life-threatening.<br>Please make sure the food contains no peanuts.' }
+    };
+    var bigEl = document.getElementById('big');
+    var noteEl = document.getElementById('note');
+    var langBtn = document.getElementById('lang');
+    function applyLang(lang) {
+      var c = CONTENT[lang] || CONTENT.hanzi;
+      bigEl.innerHTML = c.big;
+      noteEl.innerHTML = c.note;
+      langBtn.textContent = c.label;
+    }
+    var savedLang = localStorage.getItem(LANG_KEY);
+    if (LANGS.indexOf(savedLang) === -1) savedLang = 'hanzi';
+    applyLang(savedLang);
+    langBtn.addEventListener('click', function () {
+      var next = LANGS[(LANGS.indexOf(savedLang) + 1) % LANGS.length];
+      savedLang = next;
+      applyLang(next);
+      localStorage.setItem(LANG_KEY, next);
+    });
+
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', function () { navigator.serviceWorker.register('./sw.js'); });
     }
