@@ -11,6 +11,23 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
+  /* Kaiti (楷体) for the softer Chinese explanatory text */
+  @font-face {
+    font-family:'LXGW WenKai'; font-style:normal; font-weight:400; font-display:swap;
+    src:url('./fonts/lxgw-wenkai.woff2') format('woff2');
+  }
+  /* Garamond — the Latin partner for kaiti (pinyin / English explanations) */
+  @font-face {
+    font-family:'EB Garamond'; font-style:normal; font-weight:400; font-display:swap;
+    src:url('./fonts/ebgaramond-latin.woff2') format('woff2');
+    unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2122, U+2212;
+  }
+  @font-face {
+    font-family:'EB Garamond'; font-style:normal; font-weight:400; font-display:swap;
+    src:url('./fonts/ebgaramond-latinext.woff2') format('woff2');
+    unicode-range:U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+1E00-1E9F, U+2C60-2C7F, U+A720-A7FF;
+  }
+
   html, body { margin:0; height:100%; -webkit-text-size-adjust:100%; }
 
   /* ---- Theme tokens ---- */
@@ -38,7 +55,10 @@
   .rule { height:1px; background:var(--rule); margin:22px 0; }
   /* Light: hide the top divider but keep the same vertical gap the dark rule creates */
   body.light .body .rule:first-child { visibility:hidden; }
-  .note { margin:0; font-size:21px; font-weight:500; line-height:1.65; color:var(--note); }
+  .note { margin:0; font-size:22px; font-weight:400; line-height:1.7; color:var(--note);
+          font-family:'LXGW WenKai','Noto Sans SC',serif; }
+  /* Latin views (pinyin / English): pair the kaiti with Garamond */
+  body.latin-text .note { font-family:'EB Garamond',Georgia,serif; font-size:23px; line-height:1.55; }
   .iconrow { display:flex; justify-content:center; }
   .icon { position:relative; width:132px; height:132px; border-radius:50%; border:9px solid var(--icon); display:flex; align-items:center; justify-content:center; }
   .slash { position:absolute; left:50%; top:50%; width:150px; height:9px; background:var(--icon); transform:translate(-50%,-50%) rotate(45deg); border-radius:9px; }
@@ -61,19 +81,31 @@
 
   /* Detail pane */
   .detail { display:none; flex:1; overflow-y:auto; text-align:left;
-            font-family:'Noto Sans SC',sans-serif;
-            padding:34px 32px calc(30px + env(safe-area-inset-bottom)); }
+            font-family:'Noto Sans SC',sans-serif; padding:0; }
   body.view-detail .band, body.view-detail .body { display:none; }
   body.view-detail .detail { display:block; }
-  .detail-title { margin:0 0 24px; font-family:'Noto Sans SC',sans-serif;
-                  font-size:clamp(26px, 7.5vw, 34px); font-weight:900; line-height:1.15;
-                  color:var(--icon); }
-  .detail-list { list-style:none; margin:0; padding:0; }
-  .detail-list li { position:relative; padding-left:22px; margin-bottom:17px;
-                    font-size:18px; line-height:1.5; font-weight:500; color:var(--note); }
-  .detail-list li::before { content:""; position:absolute; left:0; top:0.6em;
-                            width:8px; height:8px; border-radius:50%; background:var(--icon); }
-  .detail-list b { color:var(--icon); font-weight:700; }
+  .detail-title { margin:0; background:var(--band); color:var(--big);
+                  font-family:'Noto Sans SC',sans-serif;
+                  font-size:clamp(26px, 7.5vw, 34px); font-weight:900; line-height:1.2;
+                  padding:26px 32px; text-align:center; }
+  .detail-list { padding:10px 32px calc(30px + env(safe-area-inset-bottom)); }
+  .d-item { border-top:1px solid var(--rule); }
+  .d-item:last-child { border-bottom:1px solid var(--rule); }
+  /* Light: hide the rule directly under the red band, but keep its height */
+  body.light .d-item:first-child { border-top-color:transparent; }
+  .d-item > summary { list-style:none; cursor:pointer; position:relative;
+                      padding:15px 30px 15px 0; font-size:18px; font-weight:700;
+                      line-height:1.35; color:var(--note); }
+  .d-item > summary::-webkit-details-marker { display:none; }
+  .d-item > summary::after { content:"+"; position:absolute; right:2px; top:14px;
+                             font-size:22px; font-weight:400; line-height:1; color:var(--icon); }
+  .d-item[open] > summary::after { content:"\2212"; } /* minus */
+  .d-item > p { margin:0; padding:0 30px 16px 0; font-size:16px; line-height:1.6;
+                font-weight:400; color:var(--note); opacity:0.78;
+                font-family:'LXGW WenKai','Noto Sans SC',serif; }
+  /* Latin views (pinyin / English): pair the kaiti with Garamond */
+  body.latin-text .d-item > p { font-family:'EB Garamond',Georgia,serif;
+                                font-size:16.5px; line-height:1.62; }
 </style>
 </head>
 <body class="dark">
@@ -96,7 +128,7 @@
       </div>
       <div class="detail">
         <h2 class="detail-title" id="detailTitle"></h2>
-        <ul class="detail-list" id="detailList"></ul>
+        <div class="detail-list" id="detailList"></div>
       </div>
     </div>
   </div>
@@ -144,42 +176,42 @@
                  note: '我儿子对花生严重过敏，<br>误食可能危及生命。<br>请确保食物不含花生。',
                  detailTitle: '严重花生过敏 — 请注意',
                  detail: [
-                   ['任何形式的花生都不行', '——生的、烤的、炸的、煮的或磨碎的。'],
-                   ['不要使用花生油', '——尤其是浓香压榨花生油，含有花生蛋白。'],
-                   ['不要花生酱或沙爹酱', '——包括花生碎。'],
-                   ['不要芝麻酱', '——常与花生混合或受到污染。'],
-                   ['请清洗锅具和厨具', '——如果接触过花生，使用前请清洗。'],
-                   ['不要重复使用煎炸过花生的油', ''],
-                   ['注意隐藏的花生', '——酱料、调味汁、甜点和烘焙食品中可能含有。'],
-                   ['如果不确定，请告诉我们', '——请不要猜测。']
+                   ['任何形式的花生都不行', '生的、烤的、炸的、煮的或磨碎的都很危险。'],
+                   ['不要使用花生油', '尤其是浓香压榨花生油，仍含有花生蛋白。'],
+                   ['不要花生类酱料', '花生酱、沙爹酱和沙茶酱都含有花生。'],
+                   ['不要芝麻酱', '常与花生混合或受到污染。'],
+                   ['不要撒花生碎', '凉菜、面条和甜点常在最后撒上花生碎。'],
+                   ['清洗锅具、厨具和用油', '接触过花生的锅或煎炸油，未清洗前请勿使用。'],
+                   ['注意隐藏的花生', '酱料、辣椒油、甜点和烘焙食品中可能含有。'],
+                   ['如果不确定，请询问我们', '请不要猜测。']
                  ] },
       pinyin:  { label: '拼',
                  big:  'Huāshēng<br>Guòmǐn',
                  note: 'Wǒ érzi duì huāshēng yánzhòng guòmǐn，<br>wùshí kěnéng wēijí shēngmìng。<br>Qǐng quèbǎo shíwù bù hán huāshēng。',
                  detailTitle: 'Yánzhòng huāshēng guòmǐn — qǐng zhùyì',
                  detail: [
-                   ['Rènhé xíngshì de huāshēng dōu bùxíng', '—— shēng de, kǎo de, zhá de, zhǔ de huò mó suì de.'],
-                   ['Bùyào shǐyòng huāshēng yóu', '—— yóuqí shì nóngxiāng yāzhà huāshēng yóu, hán yǒu huāshēng dànbái.'],
-                   ['Bùyào huāshēng jiàng huò shādié jiàng', '—— bāokuò huāshēng suì.'],
-                   ['Bùyào zhīma jiàng', '—— cháng yǔ huāshēng hùnhé huò shòudào wūrǎn.'],
-                   ['Qǐng qīngxǐ guōjù hé chújù', '—— rúguǒ jiēchùguò huāshēng, shǐyòng qián qǐng qīngxǐ.'],
-                   ['Bùyào chóngfù shǐyòng jiānzháguò huāshēng de yóu', ''],
-                   ['Zhùyì yǐncáng de huāshēng', '—— jiàngliào, tiáowèizhī, tiándiǎn hé hōngbèi shípǐn zhōng kěnéng hán yǒu.'],
-                   ['Rúguǒ bù quèdìng, qǐng gàosù wǒmen', '—— qǐng bùyào cāicè.']
+                   ['Rènhé xíngshì de huāshēng dōu bùxíng', 'Shēng de, kǎo de, zhá de, zhǔ de huò mó suì de dōu hěn wēixiǎn.'],
+                   ['Bùyào shǐyòng huāshēng yóu', 'Yóuqí shì nóngxiāng yāzhà huāshēng yóu, réng hán yǒu huāshēng dànbái.'],
+                   ['Bùyào huāshēng lèi jiàngliào', 'Huāshēng jiàng, shādié jiàng hé shāchá jiàng dōu hán yǒu huāshēng.'],
+                   ['Bùyào zhīma jiàng', 'Cháng yǔ huāshēng hùnhé huò shòudào wūrǎn.'],
+                   ['Bùyào sǎ huāshēng suì', 'Liángcài, miàntiáo hé tiándiǎn cháng zài zuìhòu sǎ shàng huāshēng suì.'],
+                   ['Qīngxǐ guōjù, chújù hé yòngyóu', 'Jiēchùguò huāshēng de guō huò jiānzhá yóu, wèi qīngxǐ qián qǐng wù shǐyòng.'],
+                   ['Zhùyì yǐncáng de huāshēng', 'Jiàngliào, làjiāo yóu, tiándiǎn hé hōngbèi shípǐn zhōng kěnéng hán yǒu.'],
+                   ['Rúguǒ bù quèdìng, qǐng xúnwèn wǒmen', 'Qǐng bùyào cāicè.']
                  ] },
       english: { label: 'EN',
                  big:  'Peanut<br>Allergy',
                  note: 'My son is severely allergic to peanuts.<br>Accidental ingestion may be life-threatening.<br>Please make sure the food contains no peanuts.',
                  detailTitle: 'Severe peanut allergy — please note',
                  detail: [
-                   ['No peanuts in any form', '— raw, roasted, fried, boiled, or ground.'],
-                   ['No peanut oil (花生油)', '— aromatic pressed peanut oil is common here and contains peanut protein.'],
-                   ['No peanut sauce or satay', '— including peanut paste.'],
-                   ['No sesame paste (芝麻酱)', '— it is often mixed with or contaminated by peanuts.'],
-                   ['Clean pans, woks, and utensils', '— before use if they have touched peanuts.'],
-                   ['Do not reuse frying oil', 'that peanut foods were cooked in.'],
-                   ['Watch for hidden peanuts', '— in sauces, dressings, desserts, and baked goods.'],
-                   ['If you are not sure, please tell us', '— please do not guess.']
+                   ['No peanuts in any form', 'Raw, roasted, fried, boiled, or ground — all are dangerous.'],
+                   ['No peanut oil', 'Especially aromatic pressed peanut oil (浓香花生油), which still contains peanut protein.'],
+                   ['No peanut sauces', 'Peanut sauce, satay, and sha cha sauce (沙茶酱) all contain peanut.'],
+                   ['No sesame paste (芝麻酱)', 'It is often mixed with or contaminated by peanuts.'],
+                   ['No crushed-peanut topping', 'A common last-minute garnish on cold dishes, noodles, and desserts.'],
+                   ['Clean woks, utensils, and oil', 'Do not use pans or frying oil that have touched peanuts without cleaning them first.'],
+                   ['Check for hidden peanuts', 'In sauces, chili oil, desserts, and baked goods.'],
+                   ['If you are not sure, please ask us', 'Please do not guess.']
                  ] }
     };
     var bigEl = document.getElementById('big');
@@ -191,14 +223,13 @@
       var c = CONTENT[lang] || CONTENT.hanzi;
       bigEl.innerHTML = c.big;
       bigEl.classList.toggle('latin', lang !== 'hanzi');
+      document.body.classList.toggle('latin-text', lang !== 'hanzi');
       noteEl.innerHTML = c.note;
       langBtn.textContent = c.label;
       detailTitleEl.textContent = c.detailTitle;
       detailListEl.innerHTML = c.detail.map(function (item) {
-        var b = document.createElement('b');
-        b.textContent = item[0];
-        var rest = item[1] ? ' ' + item[1] : '';
-        return '<li>' + b.outerHTML + escapeHtml(rest) + '</li>';
+        return '<details class="d-item"><summary>' + escapeHtml(item[0]) +
+               '</summary><p>' + escapeHtml(item[1]) + '</p></details>';
       }).join('');
     }
     function escapeHtml(s) {

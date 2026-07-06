@@ -1,5 +1,5 @@
 // Bump this version string to force an update when you change files.
-const CACHE = 'peanut-card-v5';
+const CACHE = 'peanut-card-v6';
 
 // App shell — cached on install so the card works fully offline.
 const SHELL = [
@@ -8,7 +8,10 @@ const SHELL = [
   './manifest.webmanifest',
   './icon-192.png',
   './icon-512.png',
-  './icon-maskable-512.png'
+  './icon-maskable-512.png',
+  './fonts/lxgw-wenkai.woff2',
+  './fonts/ebgaramond-latin.woff2',
+  './fonts/ebgaramond-latinext.woff2'
 ];
 
 self.addEventListener('install', function (e) {
