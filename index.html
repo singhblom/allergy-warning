@@ -28,6 +28,8 @@
   .band { background:var(--band); padding:28px 36px 24px; text-align:center; display:flex; flex-direction:column; align-items:center; justify-content:center; flex:1; }
   .kicker { font-family:'Inter',sans-serif; font-size:13px; font-weight:600; letter-spacing:0.24em; text-transform:uppercase; color:var(--kicker); margin-bottom:16px; }
   .big { font-family:'Noto Sans SC',sans-serif; font-size:clamp(72px, 24vw, 92px); line-height:1.02; font-weight:900; color:var(--big); letter-spacing:0.06em; }
+  /* Latin scripts (pinyin / English) are wider — scale down to fit narrow screens */
+  .big.latin { font-size:clamp(40px, 13vw, 64px); letter-spacing:0.02em; word-break:break-word; }
   body.dark  .big { animation:pulseDark  2.8s ease-in-out infinite; }
   body.light .big { animation:pulseLight 2.8s ease-in-out infinite; }
 
@@ -123,6 +125,7 @@
     function applyLang(lang) {
       var c = CONTENT[lang] || CONTENT.hanzi;
       bigEl.innerHTML = c.big;
+      bigEl.classList.toggle('latin', lang !== 'hanzi');
       noteEl.innerHTML = c.note;
       langBtn.textContent = c.label;
     }
